@@ -1,10 +1,10 @@
 import openrouteservice as ors
 from openrouteservice import convert
-from config import API_KEY #Create config file
 import json
 from hashlib import sha256
 from datetime import datetime
 now = datetime.now()
+API_KEY = "5b3ce3597851110001cf6248d6dfbdfc824242b3ace501c7eeb2d1b1"
 
 client = ors.Client(key=API_KEY) # Specify your personal API key
 
@@ -103,20 +103,15 @@ class User:
         return f"Username: {self.username}\nEmail: {self.email}\nCountry of Residence: {self.country_of_residence}"
 
 def calculate_route(hitchroute):
-    coords = [hitchroute.start_point] + hitchroute.route + [hitchroute.end_point]
-    client = ors.Client(key=API_KEY)                              # create the client for ors with API key
-    routes = client.directions(client, coords)                    # returns the optimized route as a polyline that needs to be decoded
+    coords = [hitchroute.start_point] + hitchroute.route + [hitchroute.end_point] # coordinates for the route
+    route = client.directions(client, coords)                    # returns the optimized route as a polyline that needs to be decoded
 
-    geometry = client.directions(coords)['routes'][0]['geometry'] # the two lines below decode the polyline into a dictionary
+    geometry = route['routes'][0]['geometry'] # the two lines below decode the polyline into a dictionary
     decoded = convert.decode_polyline(geometry)
     return decoded
 
 # Example usage:
 if __name__ == "__main__":
-    route1 = Route("Home", "Work")
-    driver1 = Driver("John Doe", "Toyota Camry", 4.5, 3, route1)
-
-    print(driver1)
 
     hitchroute1 = HitchRoute((8, 28), (3, 7), None, None)
     coords = ((8, 10), (12, 30))
