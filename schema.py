@@ -2,6 +2,7 @@ from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey
 from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.sql import func
+import tools
 
 # Define Database Models
 Base = declarative_base()
@@ -36,9 +37,39 @@ class HitchRoute(Base):
     start_point = Column(String,nullable = False) #JSONify coordinate
     end_point = Column(String, nullable = False) #JSONify coordinate
     current_point = Column(String, nullable = True) #JSONify coordinate
+    waypoints = Column(String,nullable = True)
     route = Column(String,nullable = True) #JSONify route
-    scheduled_time = Column(DateTime, default=func.now())  # Default to current time if not provided
 
     # Define relationships with driver (1:1)
     driver = relationship("Driver", backref="hitch_routes")
+
+    @classmethod
+    def create(session,**kw): #start point and end point is passed in
+        current_point = kw[0]
+        waypoints = [kw[0],kw[1]]
+        route = tools.readable_route(waypoints)
+        kw += [current_point,waypoints,route]
+        obj = HitchRoute(**kw)
+        session.add(obj)
+        session.commit()
+        
+
+    @classmethod
+    def update(id,dict): #start point and end point is passed in
+        current_point = kw[0]
+        waypoints = [kw[0],kw[1]]
+        route = tools.readable_route(waypoints)
+        kw += [current_point,waypoints,route]
+        obj = cls(**kw)
+
+class QRoute(Base):
+    __tablename__ = 'q_routes'
+
+    id = Column(Integer, primary_key=True)
+    start_point = Column(String,nullable = False) #JSONify coordinate
+    end_point = Column(String, nullable = False) #JSONify coordinate
+
+    @classmethod
+    def ()
+
 

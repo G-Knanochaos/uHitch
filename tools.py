@@ -80,17 +80,29 @@ class HitchRoute:
                f"Route: {self.route}\n" \
                f"Hitch Requests: {self.queue}"
 
-#determines how much more time picking up a hitcher will take
-def hitch_time_difference(hitchroute: HitchRoute, queued: QueuedRoute) -> int:
+def hitch_time_difference(hitchroute, queued):
     rcoords = tuple(hitchroute.route) # rcoords are the coordinates that refer to the coordinates that need to be reached for the hitches you accept; it
                                       # needs to be a tuple to be used
+    
     og_coords = ((hitchroute.current_point,) + rcoords + (hitchroute.end_point,)) # coordinates for the original route
     new_coords = ((hitchroute.current_point, queued.start_point) + rcoords + (queued.end_point, hitchroute.end_point)) # coordinates for the new route
+    
     og_route_duration = client.directions(client, og_coords)["summary"]["duration"] # returns the optimized route time for the original route
     new_route_duration = client.directions(client, new_coords)["summary"]["duration"] # returns the optimized route time for the new route
 
     return new_route_duration - og_route_duration
 
+def group_hitch(hitch, hitchroutes, max_delay):
+    rcoords = tuple(hitchroute.route)  
+    
+    for hitchroute in hitchroutes:
+        og_coords = ((hitchroute.current_point,) + rcoords + (hitchroute.end_point,)) # coordinates for the original route
+        new_coords = ((hitchroute.current_point, hitch.start_point) + rcoords + (hitch.end_point, hitchroute.end_point)) # coordinates for the new route
+        
+        og_route_duration = client.directions(client, og_coords)["summary"]["duration"] # returns the optimized route time for the original route
+        new_route_duration = client.directions(client, new_coords)["summary"]["duration"] # returns the optimized route time for the new route
+
+    diff = new_route_duration, og_route_duration
 
 # Example usage:
 if __name__ == "__main__":
