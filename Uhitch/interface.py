@@ -1,1 +1,0 @@
-#we're going to do a text interface for now with some extensive documentation
