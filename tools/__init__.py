@@ -3,6 +3,8 @@ from openrouteservice import convert
 from config import API_KEY #Create config file
 import json
 from hashlib import sha256
+from datetime import datetime
+now = datetime.now()
 
 client = ors.Client(key=API_KEY) # Specify your personal API key
 
@@ -11,8 +13,13 @@ class Driver:
         self.name = name  # String: Name of the driver
         self.car_make_model = car_make_model  # String: Make and model of the driver's car
         self.rating = rating  # Integer: Driver's rating
-        self.seats_available = seats_available  # Integer: Number of available seats in the car
+        self.passengers = [] #List of Users
+        self.seats_available = seats_available#Integer: Number of available seats
+        self.seats_taken = 1 #Integer: Number of Users on route
         self.current_route = current_route  # HitchRoute object: Current route the driver is on
+
+    def add_passenger(self, coordinate):
+        self.route.append(coordinate)
 
     def __str__(self):
         return f"Name: {self.name}\nCar Make/Model: {self.car_make_model}\nRating: {self.rating}\nSeats Available: {self.seats_available}\nCurrent Route: {self.current_route}"
@@ -36,21 +43,32 @@ class QueuedRoute:
         return f"Start Point: ({self.start_point.longitude}, {self.start_point.latitude})\nEnd Point: ({self.end_point.longitude}, {self.end_point.latitude})"
 
 class HitchRoute:
-    def __init__(self, start_point, end_point, group_tolerance, scheduled_time=None):
+    def __init__(self, start_point, end_point, group_tolerance, hitchhost, scheduled_time=None):
         self.start_point = start_point  # Coordinate: Starting point of the route
         self.end_point = end_point      # Coordinate: Ending point of the route
         self.current_point = start_point  # Initialize current point to the starting point
         self.driver = None              # Driver: Driver assigned to the hitch route
         self.route = []                 # List of Coordinates: Derived from ORS API
         self.queue = []                 # List of Hitch Requests
-        self.group_tolerance = group_tolerance  # Integer: Maximum number of people to share a ride with
-        self.scheduled_time = scheduled_time  # Integer: Scheduled time for the ride (optional, default: current time)
+        self.scheduled_time = scheduled_time if scheduled_time else now.time()  # Integer: Scheduled time for the ride (optional, default: current time)
 
     def add_route_coordinate(self, coordinate):
         self.route.append(coordinate)
 
-    def add_hitch_request(self, hitch_request):
-        self.queue.append(hitch_request)
+    def approve_hitch_request(self,index):
+        if self.driver.seats_taken < self.driver.seats_available:
+            pass #reject request
+
+
+    def add_hitch_request(self, QueuedRoute):
+        if self.driver.seats_taken < self.driver.seats_available:
+            #calculate detour time for QueuedRoute, use travelling salesman to calculate total time to hit Queued route points and comparing that to normal time
+            self.queue.append({
+                "Queued Route":QueuedRoute,
+                "Detour Time":5
+                })
+        else:
+            print("Cannot add hitch request")
 
     def set_driver(self, driver):
         self.driver = driver
