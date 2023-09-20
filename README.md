@@ -1,6 +1,5 @@
 # uHitch
 Uber Global Hackathon hitching/carsharing app
 
-Built in literally 12 hours
+Built in about 8 hours
 interface.py contains text interface
-- All back-end processing/ORS is contained in "tools"
