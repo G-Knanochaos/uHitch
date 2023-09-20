@@ -24,15 +24,10 @@ class Driver:
     def __str__(self):
         return f"Name: {self.name}\nCar Make/Model: {self.car_make_model}\nRating: {self.rating}\nSeats Available: {self.seats_available}\nCurrent Route: {self.current_route}"
 
-class Coordinate:
-    def __init__(self, address, longitude=None, latitude=None):
-        self.address = address #String: Address
-        self.longitude = longitude  # Integer: Longitude coordinate
-        self.latitude = latitude    # Integer: Latitude coordinate
-
-    def geocode(self, country): #searches user's country for matching addresses
-        self.longitude,self.latitude = ors.geocode.pelias_search(client,self.address,country="US")["features"][0]["geometry"]["coordinates"]
-        return(self.longitude,self.latitude)
+#needed
+def geocode(address,country): #searches user's country for matching addresses
+    return (ors.geocode.pelias_search(client,address,country="US")["features"][0]["geometry"]["coordinates"])
+    #returns tuple containing (longitude,latitude)
 
 class QueuedRoute:
     def __init__(self, start_point, end_point):
