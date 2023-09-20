@@ -102,19 +102,22 @@ class User:
     def __str__(self):
         return f"Username: {self.username}\nEmail: {self.email}\nCountry of Residence: {self.country_of_residence}"
 
-def calculate_route(hitchroute):
-    coords = [hitchroute.start_point] + hitchroute.route + [hitchroute.end_point] # coordinates for the route
-    route = client.directions(client, coords)                    # returns the optimized route as a polyline that needs to be decoded
+def hitch_time_difference(hitchroute, queued):
+    rcoords = tuple(hitchroute.route) # rcoords are the coordinates that refer to the coordinates that need to be reached for the hitches you accept; it
+                                      # needs to be a tuple to be used
+    og_coords = ((hitchroute.current_point,) + rcoords + (hitchroute.end_point,)) # coordinates for the original route
+    new_coords = ((hitchroute.current_point, queued.start_point) + rcoords + (queued.end_point, hitchroute.end_point)) # coordinates for the new route
+    og_route_duration = client.directions(client, og_coords)["summary"]["duration"] # returns the optimized route time for the original route
+    new_route_duration = client.directions(client, new_coords)["summary"]["duration"] # returns the optimized route time for the new route
 
-    geometry = route['routes'][0]['geometry'] # the two lines below decode the polyline into a dictionary
-    decoded = convert.decode_polyline(geometry)
-    return decoded
+    return new_route_duration - og_route_duration
+
 
 # Example usage:
 if __name__ == "__main__":
 
     hitchroute1 = HitchRoute((8, 28), (3, 7), None, None)
-    coords = ((8, 10), (12, 30))
+    queue1 = QueuedRoute((8, 10), (12, 30))
 
-    print(calculate_route(hitchroute1))
+    print(hitch_time_difference(hitchroute1, queue1))
 
