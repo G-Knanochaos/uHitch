@@ -102,10 +102,24 @@ class User:
     def __str__(self):
         return f"Username: {self.username}\nEmail: {self.email}\nCountry of Residence: {self.country_of_residence}"
 
+def calculate_route(hitchroute):
+    coords = [hitchroute.start_point] + hitchroute.route + [hitchroute.end_point]
+    client = ors.Client(key=API_KEY)                              # create the client for ors with API key
+    routes = client.directions(client, coords)                    # returns the optimized route as a polyline that needs to be decoded
+
+    geometry = client.directions(coords)['routes'][0]['geometry'] # the two lines below decode the polyline into a dictionary
+    decoded = convert.decode_polyline(geometry)
+    return decoded
+
 # Example usage:
 if __name__ == "__main__":
     route1 = Route("Home", "Work")
     driver1 = Driver("John Doe", "Toyota Camry", 4.5, 3, route1)
 
     print(driver1)
+
+    hitchroute1 = HitchRoute((8, 28), (3, 7), None, None)
+    coords = ((8, 10), (12, 30))
+
+    print(calculate_route(hitchroute1))
 
